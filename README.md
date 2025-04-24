@@ -48,22 +48,28 @@ Backend: http://localhost:8000
 - [x] Temel kimlik doğrulama
 - [x] Veritabanı şeması tasarımı
 - [x] GitHub entegrasyonu
-- [ ] API altyapısı genişletme
+- [x] API altyapısı genişletme
 - [ ] Frontend mimarisi geliştirme
 
 ### Faz 2: Kullanıcı Yönetimi ve Temel Modüller
 - [x] Temel kullanıcı girişi
 - [x] Rol tabanlı yetkilendirme
-- [ ] Gelişmiş kullanıcı yönetimi
-- [ ] Profil yönetimi
-- [ ] Öğrenci kayıt sistemi
-- [ ] Sınıf ve şube yönetimi
-- [ ] Öğretmen modülü
+- [x] Gelişmiş kullanıcı yönetimi
+- [x] Profil yönetimi
+- [x] Öğrenci kayıt sistemi
+- [x] Sınıf ve şube yönetimi
+- [x] Öğretmen modülü
 
 ### Faz 3: Akademik Yönetim
-- [ ] Ders ve müfredat yönetimi
+- [x] Ders ve müfredat yönetimi
 - [ ] Ders programı oluşturma
-- [ ] Not sistemi
+- [x] Not sistemi
+- [x] Devamsızlık takibi
+- [x] Ödev yönetimi
+- [x] Sınav yönetimi
+- [x] Duyuru sistemi
+- [x] Mesajlaşma sistemi
+- [x] Okul yönetimi
 - [ ] Karne ve transkript oluşturma
 - [ ] Devamsızlık takibi
 - [ ] Davranış notu sistemi
