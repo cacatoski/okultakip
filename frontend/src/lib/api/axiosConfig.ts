@@ -2,7 +2,18 @@ import axios from 'axios';
 import { auth } from '../firebase/config';
 
 // API temel URL'si
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api';
+// Tarayıcı ortamında çalışırken localhost'u kullan
+// Docker içinde çalışırken backend servis adını kullan
+let API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://backend:8000';
+
+// Tarayıcı ortamında çalışıyorsa, URL'yi localhost'a çevir
+if (typeof window !== 'undefined') {
+  // Docker içindeki backend servis adını localhost ile değiştir
+  API_URL = API_URL.replace('http://backend:', 'http://localhost:');
+  console.log('API URL (tarayıcı):', API_URL);
+} else {
+  console.log('API URL (sunucu):', API_URL);
+}
 
 // Axios örneği oluştur
 const api = axios.create({

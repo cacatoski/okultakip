@@ -1,22 +1,33 @@
-version: "3.9"
 services:
   backend:
-    build: ./backend
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
     container_name: okultakip-backend
     ports:
       - "8000:8000"
     volumes:
       - ./backend:/app
       - /app/node_modules
+      - ./backend/serviceAccountKey.json:/app/serviceAccountKey.json:ro
     environment:
       - NODE_ENV=development
+      - PORT=8000
+      - FIREBASE_PROJECT_ID=okultakip-85f77
     restart: unless-stopped
     networks:
       - okultakip-network
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   frontend:
     build:
       context: ./frontend
+      dockerfile: Dockerfile
       target: development
     container_name: okultakip-frontend
     ports:
@@ -27,12 +38,13 @@ services:
     environment:
       - NODE_ENV=development
       - NEXT_PUBLIC_API_URL=http://backend:8000/api
-      - NEXT_PUBLIC_FIREBASE_API_KEY=${FIREBASE_API_KEY}
-      - NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=${FIREBASE_AUTH_DOMAIN}
-      - NEXT_PUBLIC_FIREBASE_PROJECT_ID=${FIREBASE_PROJECT_ID}
-      - NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=${FIREBASE_STORAGE_BUCKET}
-      - NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=${FIREBASE_MESSAGING_SENDER_ID}
-      - NEXT_PUBLIC_FIREBASE_APP_ID=${FIREBASE_APP_ID}
+      - NEXT_PUBLIC_FIREBASE_API_KEY=AIzaSyAAaBucWnBDaKHbkgwPkB0jsIgBF4IaP4U
+      - NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=okultakip-85f77.firebaseapp.com
+      - NEXT_PUBLIC_FIREBASE_PROJECT_ID=okultakip-85f77
+      - NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=okultakip-85f77.firebasestorage.app
+      - NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=260277896349
+      - NEXT_PUBLIC_FIREBASE_APP_ID=1:260277896349:web:392939d56cae8007e6c074
+      - NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=G-57TRQXMKQL
     depends_on:
       - backend
     restart: unless-stopped
@@ -42,3 +54,8 @@ services:
 networks:
   okultakip-network:
     driver: bridge
+    driver_opts:
+      com.docker.network.driver.mtu: 1450
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

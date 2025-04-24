@@ -5,7 +5,7 @@ WORKDIR /app
 
 # Bağımlılıkları kopyala ve yükle
 COPY package.json package-lock.json* ./
-RUN npm ci
+RUN npm install
 
 # Kaynak kodları kopyala
 COPY . .
@@ -13,6 +13,7 @@ COPY . .
 # Geliştirme ortamı için
 FROM base AS development
 ENV NODE_ENV=development
+# ESLint kontrolünü atla ve doğrudan geliştirme modunda çalıştır
 CMD ["npm", "run", "dev"]
 
 # Üretim ortamı için build aşaması

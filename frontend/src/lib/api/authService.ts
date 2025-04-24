@@ -15,15 +15,19 @@ export const register = async (email: string, password: string, role: string, di
     const user = userCredential.user;
     
     // Backend API'ye kullanıcı bilgilerini gönder
-    const response = await api.post('/users', {
+    console.log('Backend API isteği gönderiliyor...');
+    const response = await api.post('/auth/registerUser', {
       email,
+      password, // Bu aslında güvenlik açısından ideal değil, sadece test için
       displayName,
       role,
       uid: user.uid
     });
     
+    console.log('Kayıt başarılı:', response.data);
     return response.data;
   } catch (error: any) {
+    console.error('Kayıt hatası:', error);
     throw new Error(error.message);
   }
 };
@@ -31,17 +35,64 @@ export const register = async (email: string, password: string, role: string, di
 // Kullanıcı girişi
 export const login = async (email: string, password: string) => {
   try {
+    console.log(`Giriş deneniyor: ${email}`);
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
+    const idToken = await user.getIdToken();
     
-    // Kullanıcı bilgilerini getir
-    const response = await api.get(`/users/${user.uid}`);
+    // Backend'den kullanıcı bilgilerini getir - en fazla 3 kez deneme yap
+    let retryCount = 0;
+    const maxRetries = 3;
+    let lastError = null;
     
+    while (retryCount < maxRetries) {
+      try {
+        console.log(`Token doğrulanıyor... (Deneme ${retryCount + 1}/${maxRetries})`);
+        
+        // Önce verifyToken endpoint'ini dene
+        try {
+          const response = await api.post('/auth/verifyToken', { idToken });
+          console.log('Giriş başarılı:', response.data);
+          return {
+            user: response.data.user,
+            token: idToken
+          };
+        } catch (verifyTokenError) {
+          console.log('verifyToken endpoint hatası, verify-token deneniyor...');
+          // verifyToken başarısız olursa, verify-token endpoint'ini dene
+          const response = await api.post('/auth/verify-token', { idToken });
+          console.log('Giriş başarılı (verify-token):', response.data);
+          return {
+            user: response.data.user,
+            token: idToken
+          };
+        }
+      } catch (backendError) {
+        lastError = backendError;
+        console.error(`Backend doğrulama hatası (Deneme ${retryCount + 1}/${maxRetries}):`, backendError);
+        retryCount++;
+        
+        if (retryCount < maxRetries) {
+          // Bir sonraki denemeden önce kısa bir bekleme süresi
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+      }
+    }
+    
+    // Tüm denemeler başarısız olduğunda, Firebase'den aldığımız temel bilgilerle devam et
+    console.log('Backend doğrulama başarısız, temel kullanıcı bilgileri kullanılıyor');
     return {
-      user: response.data,
-      token: await user.getIdToken()
+      user: {
+        uid: user.uid,
+        email: user.email,
+        displayName: user.displayName || email.split('@')[0],
+        role: 'student', // Varsayılan rol
+        authSource: 'firebase-only' // Backend doğrulaması olmadan sadece Firebase'den geldiğini belirt
+      },
+      token: idToken
     };
   } catch (error: any) {
+    console.error('Giriş hatası:', error);
     throw new Error(error.message);
   }
 };

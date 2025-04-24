@@ -18,7 +18,7 @@ Okul Takip, eğitim kurumları için geliştirilmiş kapsamlı bir yönetim sist
 
 ## 🚀 Başlangıç
 
-### Gereksinimler
+### 📝 Gereksinimler
 
 - Node.js (v18+)
 - Docker ve Docker Compose
@@ -27,17 +27,56 @@ Okul Takip, eğitim kurumları için geliştirilmiş kapsamlı bir yönetim sist
 
 ### Kurulum
 
+#### 1. Projeyi Klonlama
+
 ```bash
 # Projeyi klonlayın
 git clone https://github.com/yourusername/okultakip.git
 cd okultakip
-
-# Docker ile çalıştırın
-docker-compose up -d
 ```
 
-Frontend: http://localhost:3000  
-Backend: http://localhost:8000
+#### 2. Firebase Yapılandırması
+
+1. [Firebase Console](https://console.firebase.google.com/) üzerinden yeni bir proje oluşturun
+2. Authentication ve Firestore servislerini etkinleştirin
+3. Web uygulaması ekleyin ve yapılandırma bilgilerini alın
+4. Firebase Admin SDK için servis hesabı anahtarı oluşturun ve indirin
+
+```bash
+# Firebase CLI ile giriş yapın
+firebase login
+
+# Projeyi Firebase'e bağlayın
+firebase use --add
+
+# Servis hesabı anahtarını backend klasörüne kopyalayın
+cp path/to/serviceAccountKey.json backend/
+```
+
+#### 3. Docker ile Çalıştırma
+
+```bash
+# Docker konteynerlerini oluşturun ve başlatın
+docker-compose up -d
+
+# Logları izleyin
+docker-compose logs -f
+```
+
+#### 4. Erişim Noktaları
+
+- Frontend: [http://localhost:3000](http://localhost:3000)  
+- Backend API: [http://localhost:8000](http://localhost:8000)
+- API Sağlık Kontrolü: [http://localhost:8000/api/health](http://localhost:8000/api/health)
+
+#### 5. Docker Ağ Yapılandırması
+
+Proje, optimize edilmiş bir Docker ağ yapılandırması kullanmaktadır:
+
+- Bridge driver ile özel bir ağ
+- MTU değeri: 1450
+- Sabit subnet: 172.20.0.0/16
+- Konteynerler arası iletişim için optimize edilmiş
 
 ## 📊 Geliştirme Yol Haritası
 
@@ -59,6 +98,8 @@ Backend: http://localhost:8000
 - [x] Öğrenci kayıt sistemi
 - [x] Sınıf ve şube yönetimi
 - [x] Öğretmen modülü
+- [x] Firebase Authentication entegrasyonu
+- [x] Firestore veritabanı entegrasyonu
 
 ### Faz 3: Akademik Yönetim
 - [x] Ders ve müfredat yönetimi
@@ -124,6 +165,52 @@ Backend: http://localhost:8000
 - [ ] API dokümantasyonu
 - [ ] Teknik dokümantasyon
 - [ ] Destek sistemi
+
+## 🔧 Teknik Detaylar
+
+### Firebase Entegrasyonu
+
+Proje, aşağıdaki Firebase servislerini kullanmaktadır:
+
+- **Firebase Authentication**: Kullanıcı kimlik doğrulama ve yönetimi
+- **Firestore**: NoSQL veritabanı depolama
+- **Firebase Storage**: Dosya depolama (belgeler, resimler, vb.)
+- **Firebase Cloud Messaging**: Bildirim gönderimi (gelecek sürümlerde)
+
+### Docker Yapılandırması
+
+Proje, iki ana konteyner kullanmaktadır:
+
+1. **Backend (Node.js/Express)**
+   - Port: 8000
+   - Firebase Admin SDK entegrasyonu
+   - RESTful API endpoints
+   - Middleware: CORS, Helmet, Rate Limiting
+
+2. **Frontend (Next.js/React)**
+   - Port: 3000
+   - Firebase Web SDK entegrasyonu
+   - Modern UI/UX tasarımı
+   - Responsive tasarım
+
+### Ağ Mimarisi
+
+```ascii
++----------------+     +----------------+
+|                |     |                |
+|    Frontend    |<--->|    Backend     |
+|  (Next.js)     |     |  (Express.js)  |
+|                |     |                |
++----------------+     +----------------+
+        |                      |
+        v                      v
++-------------------------------------------+
+|                                           |
+|              Firebase Cloud                |
+|  (Authentication, Firestore, Storage)      |
+|                                           |
++-------------------------------------------+
+```
 
 ## 👥 Kullanıcı Rolleri ve Özellikleri
 
