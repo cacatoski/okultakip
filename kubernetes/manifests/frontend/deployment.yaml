@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: okultakip-frontend
+  labels:
+    app: okultakip
+    component: frontend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: okultakip
+      component: frontend
+  template:
+    metadata:
+      labels:
+        app: okultakip
+        component: frontend
+    spec:
+      containers:
+      - name: frontend
+        image: okultakip-frontend:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 3000
+          name: http
+        env:
+        - name: NODE_ENV
+          value: "production"
+        - name: NEXT_PUBLIC_API_URL
+          value: "http://okultakip-backend:8000/api"
+        - name: NEXT_PUBLIC_FIREBASE_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: firebase-config
+              key: api-key
+        - name: NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
+          value: "okultakip-85f77.firebaseapp.com"
+        - name: NEXT_PUBLIC_FIREBASE_PROJECT_ID
+          value: "okultakip-85f77"
+        - name: NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
+          value: "okultakip-85f77.firebasestorage.app"
+        - name: NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
+          valueFrom:
+            secretKeyRef:
+              name: firebase-config
+              key: messaging-sender-id
+        - name: NEXT_PUBLIC_FIREBASE_APP_ID
+          valueFrom:
+            secretKeyRef:
+              name: firebase-config
+              key: app-id
+        - name: NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
+          valueFrom:
+            secretKeyRef:
+              name: firebase-config
+              key: measurement-id
+        resources:
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+          requests:
+            cpu: "200m"
+            memory: "256Mi"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /
+            port: http
+          initialDelaySeconds: 5
+          periodSeconds: 5

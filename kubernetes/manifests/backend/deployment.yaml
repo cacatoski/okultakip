@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: okultakip-backend
+  labels:
+    app: okultakip
+    component: backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: okultakip
+      component: backend
+  template:
+    metadata:
+      labels:
+        app: okultakip
+        component: backend
+    spec:
+      containers:
+      - name: backend
+        image: okultakip-backend:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8000
+          name: http
+        env:
+        - name: NODE_ENV
+          value: "production"
+        - name: PORT
+          value: "8000"
+        - name: FIREBASE_PROJECT_ID
+          value: "okultakip-85f77"
+        # Firebase Admin SDK servis hesabı anahtarı için Secret kullanılacak
+        volumeMounts:
+        - name: firebase-service-account
+          mountPath: "/app/serviceAccountKey.json"
+          subPath: "serviceAccountKey.json"
+          readOnly: true
+        resources:
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+          requests:
+            cpu: "200m"
+            memory: "256Mi"
+        livenessProbe:
+          httpGet:
+            path: /api/health
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /api/health
+            port: http
+          initialDelaySeconds: 5
+          periodSeconds: 5
+      volumes:
+      - name: firebase-service-account
+        secret:
+          secretName: firebase-service-account
