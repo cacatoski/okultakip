@@ -1,16 +1,37 @@
-FROM node:18-alpine
+FROM node:18-alpine AS base
 
+# Çalışma dizini oluştur
 WORKDIR /app
 
-# Önce bağımlılıkları kopyala ve yükle
-COPY package*.json ./
-RUN npm install
+# Bağımlılıkları kopyala ve yükle
+COPY package.json package-lock.json* ./
+RUN npm ci
 
-# Sonra kaynak kodları kopyala
+# Kaynak kodları kopyala
 COPY . .
 
-# Uygulama portunu belirt
-EXPOSE 3000
+# Geliştirme ortamı için
+FROM base AS development
+ENV NODE_ENV=development
+CMD ["npm", "run", "dev"]
+
+# Üretim ortamı için build aşaması
+FROM base AS build
+ENV NODE_ENV=production
+RUN npm run build
+
+# Üretim ortamı için çalıştırma aşaması
+FROM node:18-alpine AS production
+WORKDIR /app
+
+ENV NODE_ENV=production
+
+# Sadece gerekli dosyaları kopyala
+COPY --from=build /app/next.config.js ./
+COPY --from=build /app/public ./public
+COPY --from=build /app/.next ./.next
+COPY --from=build /app/node_modules ./node_modules
+COPY --from=build /app/package.json ./package.json
 
 # Uygulamayı başlat
-CMD ["npm", "start"]
+CMD ["npm", "run", "start"]

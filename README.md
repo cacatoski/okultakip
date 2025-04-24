@@ -49,7 +49,7 @@ Backend: http://localhost:8000
 - [x] Veritabanı şeması tasarımı
 - [x] GitHub entegrasyonu
 - [x] API altyapısı genişletme
-- [ ] Frontend mimarisi geliştirme
+- [x] Frontend mimarisi geliştirme
 
 ### Faz 2: Kullanıcı Yönetimi ve Temel Modüller
 - [x] Temel kullanıcı girişi
