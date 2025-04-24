@@ -1,0 +1,5 @@
+echo '{
+  "fields": {
+    "role": { "stringValue": "teacher" }
+  }
+}' > role.json

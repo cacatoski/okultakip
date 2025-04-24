@@ -1,0 +1,9 @@
+{
+  "projects": {
+    "default": "okultakip-85f77",
+    "startup": "okultakip-85f77",
+    "staging": "okultakip-85f77"
+  },
+  "targets": {},
+  "etags": {}
+}

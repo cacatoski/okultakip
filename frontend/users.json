@@ -1,0 +1,13 @@
+{"users": [
+{
+  "localId": "1KbcFHFh2Rhgvd4vgi44prpdgLJ2",
+  "email": "demo@cowork.com",
+  "emailVerified": false,
+  "passwordHash": "Qtaxh0sQaLLDp6OIbE7Tpm6ay3eAoEtd3ZXfh8wmuRmkZpJedgAHdnMTINQo+qrR1vkAhR9/Xnj4vzBWl9GmAA==",
+  "salt": "WQzOTW033nFCvw==",
+  "lastSignedInAt": "1745494974521",
+  "createdAt": "1745494803311",
+  "disabled": false,
+  "customAttributes": "{\"role\":\"teacher\"}",
+  "providerUserInfo": []
+}]}

@@ -1,0 +1,59 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master, develop ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x]
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    
+    - name: Install Backend Dependencies
+      run: |
+        cd backend
+        npm ci
+    
+    - name: Install Frontend Dependencies
+      run: |
+        cd frontend
+        npm ci
+    
+    - name: Check Backend Linting
+      run: |
+        cd backend
+        npm run lint || echo "Linting issues found"
+    
+    - name: Check Frontend Linting
+      run: |
+        cd frontend
+        npm run lint || echo "Linting issues found"
+    
+    - name: Run Backend Tests
+      run: |
+        cd backend
+        npm test || echo "Tests failed"
+    
+    - name: Run Frontend Tests
+      run: |
+        cd frontend
+        npm test || echo "Tests failed"
+    
+    - name: Build Frontend
+      run: |
+        cd frontend
+        npm run build

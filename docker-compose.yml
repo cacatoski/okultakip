@@ -1,0 +1,35 @@
+version: "3.9"
+services:
+  backend:
+    build: ./backend
+    container_name: okultakip-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+    restart: unless-stopped
+    networks:
+      - okultakip-network
+
+  frontend:
+    build: ./frontend
+    container_name: okultakip-frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - okultakip-network
+
+networks:
+  okultakip-network:
+    driver: bridge
